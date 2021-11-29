@@ -90,3 +90,87 @@ FROM
     ON e.BusinessEntityID = c.BusinessEntityID
 ORDER BY
   c.BusinessEntityID;
+
+1. For each employee display job title and date when employee was hired. (use table 
+HumanResources.Employee) [8 marks] 
+2. Show all the information about products which have standard cost between 90 and 100. Sort 
+results by standard cost in descending order. (Use table Production.Product) [10 marks] 
+3. Show products that have name containing word “Mountain”, and price between 500 and 800. In 
+the output display product name, sell start date, subcategory name, price, and color. Provide 
+meaningful names for the columns in the results. Sort results by color in descending order and 
+then by product name in ascending order. (Use tables production.Product and 
+production.ProductSubcategory) [14 marks] 
+4. For each combination of marital status and gender show average sick leave hours of employees 
+and number of employees. Filter out employees who was born before '1980-10-10'. In the results 
+show only those records where average sick leave hours is more than 43. Provide meaningful 
+names for the columns in the results. Sort results by average sick leave hours in ascending order. 
+(Use table HumanResources.Employee) [15 marks] 
+5. Show all sales persons who has bonus more than 100 and last year sales more than the average 
+last year sales among all sales persons. In the results display sales persons first and last names, 
+, months since ModifiedDate of the sales person till now, and average sales last year among all 
+sales persons. Provide meaningful names for the columns in the results. Sort results by the last 
+name in descending order. (Use tables Sales.SalesPerson and Person.Person) [18 marks] 
+6. Create one view for any SQL query. State if the view is updatable or not, explain your decision. 
+[10 marks] 
+7. Show business entities where store name contains word “Toy”. For each business entity display 
+entity ModifiedDate, business contact type name, store name, and full business entity address in 
+the format: “AddressLine1, PostalCode” (notice, separated by comma), e.g. “252851 Rowan 
+Place, V6B 3P7”. Provide meaningful names for the columns in the results. Sort results by contact 
+type name in ascending order, then by store name in descending order, and then by entity 
+ModifiedDate in ascending order. (Use tables Person.BusinessEntity, 
+person.BusinessEntityContact, person.ContactType, person.BusinessEntityAddress, 
+person.Address, Sales.Store). [25 marks] 
+Westminster International University in Tashkent
+2020 – 2021 Academic Year 
+DBSD, Business Information Systems
+Slot 1 In-class test 1 
+Answers 
+(please note that alternative solutions are also possible, below only one 
+possible solution is provided for each task) 
+1. 
+SELECT JobTitle, HireDate "date hired" 
+from HumanResources.Employee 
+order by HireDate desc 
+2. 
+select * 
+from Production.Product 
+where StandardCost between 90 and 100 
+order by StandardCost desc 
+3. 
+select p.Name "Product name", p.SellStartDate "Date on sail", c.Name "Suncategory name",
+p.ListPrice, p.Color "Product color" 
+from production.Product p 
+ join production.ProductSubcategory c on p.ProductSubcategoryID =
+c.ProductSubcategoryID 
+where c.Name like '%Mountain%' and p.ListPrice between 600 and 900 
+order by p.Color desc , c.Name asc 
+4. 
+select MaritalStatus, Gender, count(*) "Num of employees", avg(SickLeaveHours) "Avg seak 
+leave hours" 
+from HumanResources.Employee 
+where BirthDate > '1980-10-10'
+group by MaritalStatus, Gender 
+having avg(SickLeaveHours) > 43 
+order by "Avg seak leave hours" asc 
+5. 
+select p.FirstName, p.LastName 
+ , DATEDIFF(month, sp.ModifiedDate, getdate()) "Months till now" 
+, (select avg(SalesLastYear) from Sales.SalesPerson) "Avg sales last year" 
+from Sales.SalesPerson sp join [Person].[Person] p on sp.BusinessEntityID =
+p.BusinessEntityID 
+where sp.Bonus > 100 and sp.SalesLastYear > (select avg(SalesLastYear) from
+Sales.SalesPerson)
+order by p.lastname desc 
+7. 
+select e.ModifiedDate "Business entity date modified" 
+ ,ct.Name "Business contact type name" 
+ ,concat (a.AddressLine1, ', ', a.PostalCode) "Full address" 
+ ,s.Name "Store name" 
+from Person.BusinessEntity e 
+ join person.BusinessEntityContact ec on ec.BusinessEntityID = e.BusinessEntityID 
+ join person.ContactType ct on ct.ContactTypeID = ec.ContactTypeID 
+ join person.BusinessEntityAddress ea on ea.BusinessEntityID = e.BusinessEntityID 
+ join person.Address a on a.AddressID = ea.AddressID 
+ join Sales.Store s on s.BusinessEntityID = e.BusinessEntityID 
+where s.Name like '%Toy%'
+order by ct.Name asc, s.Name desc, e.ModifiedDate asc
